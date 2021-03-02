@@ -1,0 +1,149 @@
+﻿@model Discussion_Forum.Models.QuestionAnswerViewModel
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<UserAccount> signInManager;
+@inject UserManager<UserAccount> _userManager;
+@{
+    ViewData["Title"] = "Question Answers Details";
+}
+
+@*@{int qid = Model.Questions.QuestionId;
+    Console.WriteLine(qid);}*@
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"> Discussion Forum</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" asp-controller="UserAccounts" asp-action="Home">
+                        Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="UserAccounts" asp-action="AddQuestion">Add Questions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="UserAccounts" asp-action="PostedQuest" asp-route-id="@_userManager.GetUserId(User)">Posted Questions</a>
+                </li>
+                @*<li class="nav-item">
+                            asp-route-id="@HttpContextAccessor.HttpContext.Session.GetString("userID")"
+                        <a class="nav-link" href="#">  @HttpContextAccessor.HttpContext.Session.GetString("userName")</a>
+                        @{Console.WriteLine(HttpContextAccessor.HttpContext.Session.GetString("userName"));}
+                    </li>*@
+            </ul>
+            @if (signInManager.IsSignedIn(User))
+            {
+                <div class="dropdown show">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @User.Identity.Name
+
+                        @*@HttpContextAccessor.HttpContext.Session.GetString("userName")*@
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" asp-action="Logout">Logout</a>
+                        <a class="dropdown-item" asp-route-id="@_userManager.GetUserId(User)" asp-action="Edit">Profile</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                Context.Response.Redirect("Index");
+            }
+        </div>
+    </div>
+</nav>
+<h2>Question</h2>
+<div class="container-fluid mt-100">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="media flex-wrap w-5 align-items-center">
+                        <img src="~/images/profilelogo_.jpg" class="d-block ui-w-20 rounded-circle" alt="">
+                        <div class="media-body ml-3">
+                            <a @*href="javascript:void(0)" data-abc="true"*@>@Model.Questions.UserAccount.FullName</a>
+                            @*<div class="text-muted small">13 days ago</div>*@
+                        </div>
+                        <div class="text-muted small ml-3">
+
+                            <div><strong>@Model.Questions.CreatedDate.ToShortDateString()</strong> posted</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>
+                        @Model.Questions.Questions
+                    </p>
+
+                </div>
+                <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
+                    <div class="px-4 pt-3">
+                        <a href="javascript:void(0)" class="text-muted d-inline-flex align-items-center align-middle" data-abc="true">
+                            <i class="fa fa-heart text-danger"></i>&nbsp; <span class="align-middle">@Model.Questions.Topic.TopicName</span>
+                        </a>
+                    </div>
+                    <div class="px-4 pt-3">
+                        @*"Details"*@
+                        @*<a asp-controller="UserAccounts" asp-action="QuestAnsDetails" asp-route-id="@item.AnswerId">Details</a> |*@
+                        <a asp-controller="UserAccounts" asp-action="AnswerPost" asp-route-id="@Model.Questions.QuestionId">
+                            <input type="button" class="btn btn-primary" value="Post Your Answer" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Answers</h2>
+@foreach (var item in Model.Answers)
+{
+
+    <div class="container-fluid mt-100">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="media flex-wrap w-5 align-items-center">
+                            <img src="~/images/profilelogo_.jpg" class="d-block ui-w-20 rounded-circle" alt="">
+                            <div class="media-body ml-3">
+                                <a @*href="javascript:void(0)" data-abc="true"*@>@item.UserAccount.FullName</a>
+                                @*<div class="text-muted small">13 days ago</div>*@
+                            </div>
+                            <div class="text-muted small ml-3">
+
+                                <div><strong>@item.AnsDate.ToShortDateString()</strong> posted</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            @item.Answers
+                        </p>
+
+                    </div>
+                    <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
+                        <div class="px-4 pt-3">
+                            <a href="javascript:void(0)" class="text-muted d-inline-flex align-items-center align-middle" data-abc="true">
+                                <i class="fa fa-heart text-danger"></i>&nbsp; <span class="align-middle">@Model.Questions.Topic.TopicName</span>
+                            </a>
+                        </div>
+                        <!--<div class="px-4 pt-3">-->
+                        @*"Details"*@
+                        <!--<a asp-controller="UserAccounts" asp-action="QuestAnsDetails" asp-route-id="@item.AnswerId">Details</a> |
+                            <button type="button" class="btn btn-primary">
+                                <i class="ion ion-md-create"></i>&nbsp; Answers
+                            </button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

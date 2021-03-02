@@ -1,0 +1,196 @@
+﻿@model IEnumerable<Discussion_Forum.Models.Question>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<UserAccount> signInManager;
+@inject UserManager<UserAccount> _userManager;
+@{
+    ViewData["Title"] = "Discussion Forum User Home";
+}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"> Discussion Forum</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" asp-controller="UserAccounts" asp-action="Home">
+                        Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="UserAccounts" asp-action="AddQuestion">Add Questions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="UserAccounts" asp-action="PostedQuest" asp-route-id="@_userManager.GetUserId(User)">Posted Questions</a>
+                </li>
+                @*<li class="nav-item">
+                            asp-route-id="@HttpContextAccessor.HttpContext.Session.GetString("userID")"
+                        <a class="nav-link" href="#">  @HttpContextAccessor.HttpContext.Session.GetString("userName")</a>
+                        @{Console.WriteLine(HttpContextAccessor.HttpContext.Session.GetString("userName"));}
+                    </li>*@
+            </ul>
+            @if (signInManager.IsSignedIn(User))
+            {
+                <div class="dropdown show">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @User.Identity.Name
+                        
+                        @*@HttpContextAccessor.HttpContext.Session.GetString("userName")*@
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" asp-action="Logout">Logout</a>
+                        <a class="dropdown-item" asp-route-id="@_userManager.GetUserId(User)" asp-action="Edit">Profile</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                Context.Response.Redirect("Index");
+            }
+        </div>
+    </div>
+</nav>
+
+
+
+
+
+@foreach (var item in Model)
+{
+
+    <div class="container-fluid mt-100">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="media flex-wrap w-5 align-items-center">
+                            <img src="~/images/profilelogo_.jpg" class="d-block ui-w-20 rounded-circle" alt="">
+                            <div class="media-body ml-3">
+                                <a @*href="javascript:void(0)" data-abc="true"*@>@Html.DisplayFor(modelItem => item.UserAccount.FullName)</a>
+                                @*<div class="text-muted small">13 days ago</div>*@
+                            </div>
+                            <div class="text-muted small ml-3">
+
+                                <div><strong>@Html.DisplayFor(modelItem => item.CreatedDate)</strong> posted</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            @Html.DisplayFor(modelItem => item.Questions)
+                        </p>
+
+                    </div>
+                    <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
+                        <div class="px-4 pt-3">
+                            <a href="javascript:void(0)" class="text-muted d-inline-flex align-items-center align-middle" data-abc="true">
+                                <i class="fa fa-heart text-danger"></i>&nbsp; <span class="align-middle">@Html.DisplayFor(modelItem => item.Topic.TopicName)</span>
+                            </a>
+                        </div>
+                        <div class="px-4 pt-3">
+                            @*"Details"*@
+                            @*<a asp-controller="UserAccounts" asp-action="QuestAnsDetails" asp-route-id="@item.QuestionId">Details</a> |*@
+                            <a asp-controller="UserAccounts" asp-action="QuestAnsDetails" asp-route-id="@item.QuestionId">
+                                <input type="button" class="btn btn-primary" value="Details & View Answers" />
+                            </a>
+                            @*<a name="@item.QuestionId" href="#" onclick='showAnswerForm("@item.QuestionId");'> Answer </a>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@*<p>
+        <a asp-action="Create">Create New</a>
+    </p>*@
+
+
+@*<table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Topic)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserAccount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Questions)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreatedDate)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Topic.TopicName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserAccount.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Questions)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </td>
+                    <td>
+                        <a asp-controller="Questions" asp-action="Details" asp-route-id="@item.QuestionId">Details</a> |
+                        <a asp-action="AnswerView" asp-route-id="@item.QuestionId">Answers</a> |
+                        <a name="@item.QuestionId" href="#" onclick='showAnswerForm("@item.QuestionId");'> Reply </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
+<div id="signupbox" style="display: none; margin-top: 50px;" class="mainbox col-lg-6 offset-md-3 col-md-8 offset-sm-2">
+    <div class="card card-inverse card-info">
+        <div class="card-header">
+            <div class="card-title">Answer Here</div>
+            <div style="float: right; font-size: 85%; position: relative; top: -10px;">
+                <a id="signinlink" href="#" onclick="$('#signupbox').hide(); $('#loginbox').show()">Sign In</a>
+            </div>
+        </div>
+        <div class="card-block">
+            <form id="signupform" class="" role="form" asp-action="Answersubmit">
+                <div id="signupalert" style="display: none;" class="alert alert-danger">
+                    <p>Error:</p> <span></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="firstname" class="col-lg-3 form-control-label">Your answer</label>
+                    <div class="col-lg-9">
+                        <textarea rows="5" cols="60" class="form-control" name="Answers"></textarea>
+                        <input type="hidden" name="UserId" value=@HttpContextAccessor.HttpContext.Session.GetString("userID") />
+                        <input type="hidden" name="QuestId" id="QuestId" value="" />
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    Button
+                    <div class="col-md-12 controls">
+                        <input type="submit" value="Submit" class="btn btn-success" />
+                        @*<a id="btn-login" href="#" class="btn btn-success">Login  </a>
+                            <a id="btn-fblogin"
+                               href="#" class="btn btn-primary">Login with Facebook</a> *@
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>-->
